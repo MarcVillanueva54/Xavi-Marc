@@ -298,6 +298,8 @@ public class GestorMenú implements Serializable {
 
         boolean interno = des.toUpperCase().equals("S");
 
+        Facturación facturación = new Facturación(new Coste(0.0), "1");
+
         Resultado res = new Resultado(identificador, horas, interno);
         Tarea tarea = new Tarea(nombre, descripcion, new ArrayList<>(), Integer.parseInt(prio), fechaI, fechaF, res, lEtiquetas);
         proyecto.añadirTarea(tarea);
