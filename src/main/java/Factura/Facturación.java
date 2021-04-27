@@ -2,13 +2,23 @@ package Factura;
 
 import Coste.Coste;
 
+enum Tipo{
+    Urgente, ConsumoInterno, Descuento
+}
+
 public class Facturación {
-    private Coste coste;
+    private double precio;
+    private String op;
 
-    public Facturación(){
+    public Facturación(Coste coste, String op){
+        precio = coste.precio;
+        this.op = op;
     }
 
-    Coste getCoste(){
-        return this.coste;
-    }
+    
+
+
+
+
+
 }

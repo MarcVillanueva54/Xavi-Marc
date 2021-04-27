@@ -1,5 +1,7 @@
 package Gestor;
 
+import Coste.Coste;
+import Factura.Facturación;
 import Resultado.Resultado;
 import Persona.Persona;
 import Proyecto.Proyecto;
@@ -165,6 +167,15 @@ public class GestorMenú implements Serializable {
                         System.out.println("Destinando a la comercialización? (S/N) ");
                         res = teclado.nextLine();
                     }
+                    System.out.println("Indica el coste previsto de la tarea (0.0): ");
+                    String precio = teclado.nextLine();
+                    Coste coste = new Coste(Double.parseDouble(precio));
+
+                    System.out.println("Indica el tipo de facturación deseada (Urgente: 0, ConsumoInterno: 1," +
+                            " Descuento: 2): ");
+                    String op = teclado.nextLine();
+                    Facturación facturación = new Facturación(coste, op);
+
                     System.out.println("Introduce etiquetas de la tarea (vacío para finalizar): ");
                     ArrayList<String> etiquetas = new ArrayList<String>();
                     String etiqueta = teclado.nextLine();

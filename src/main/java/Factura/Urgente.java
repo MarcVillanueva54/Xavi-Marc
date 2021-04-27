@@ -7,14 +7,15 @@ public class Urgente extends Facturación implements CalculoFacturación {
     private double variable;
     private Coste coste;
 
-    public Urgente(){
-        super();
+    public Urgente(Coste coste, String op){
+        super(coste, op);
         variable = 1.99;
+        this.coste = coste;
 
     }
 
     @Override
     public double getPrecio() {
-        return 0;
+        return this.coste.precio + variable;
     }
 }

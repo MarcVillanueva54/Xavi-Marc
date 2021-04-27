@@ -7,12 +7,14 @@ public class ConsumoInterno extends Facturación implements CalculoFacturación 
     private double variable;
     private Coste coste;
 
-    public ConsumoInterno(){
+    public ConsumoInterno(Coste coste, String op){
+        super(coste, op);
         variable = 0.00;
+        this.coste = coste;
     }
 
     @Override
     public double getPrecio() {
-        return variable;
+        return this.coste.precio + variable;
     }
 }
