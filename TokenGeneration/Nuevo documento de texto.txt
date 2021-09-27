@@ -1,0 +1,112 @@
+package main
+
+import (
+	"bufio"
+	"cloud.google.com/go/firestore"
+	"context"
+	firebase "firebase.google.com/go"
+	"flag"
+	"fmt"
+	jwt "github.com/golang-jwt/jwt"
+	"google.golang.org/api/option"
+	"log"
+	"os"
+	"strings"
+	"time"
+)
+
+func main(){
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("bbdd-go-firebase-adminsdk-11p69-0286d5e162.json")
+	app, err := firebase.NewApp(context.Background(), nil, sa)
+	if err != nil{
+		log.Fatalln(err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil{
+		log.Fatalln(err)
+	}
+
+	readerOp := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Select role: Patient(0), Therapist(1), CentreAdmin(2), SuperUser(3): ")
+	selectedRoleOp, _ := readerOp.ReadString('\n')
+	roleName := ""
+	switch {
+	case strings.TrimRight(selectedRoleOp, "\n") == "0":
+		roleName = "Patient"
+	case strings.TrimRight(selectedRoleOp, "\n") == "1":
+		roleName = "Therapist"
+	case strings.TrimRight(selectedRoleOp, "\n") == "2":
+		roleName = "CentreAdmin"
+	case strings.TrimRight(selectedRoleOp, "\n") == "3":
+		roleName = "SuperUser"
+	}
+
+
+	//==============CLAIMS=====================//
+	claims := map[string]interface{}{
+		"role": roleName,
+		"user_id": "some-uid",
+		"centre_id": "some-centre",
+	}
+
+	firebasee := map[string]interface{}{
+		"identities" : "{}",
+		"sign_in_provider" : "custom",
+	}
+	//================FECHA=====================//
+	ahora := time.Now()
+	fechaExp := ahora.Add(time.Hour)
+	//==========================================//
+
+	token2 := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"provider_id" : "custom",
+		"iss" : "https://securetoken.google.com/bbdd-go",
+		"aud" : "bbdd-go",
+		"auth_time" : ahora.Format(time.RFC1123),
+		"user_id" : firestore.Client{},
+		"sub" : "",
+		"iat" : ahora.Format(time.RFC1123),
+		"exp" : fechaExp,
+		"firebase" : firebasee,
+		"claims" : claims,
+
+	})
+	err = client.Close()
+	if err != nil {
+		return
+	}
+
+	/*
+		token, err := client.CustomTokenWithClaims(ctx,"some_uid", claims)
+		if err != nil{
+			log.Fatalln("error mintin custom token : %v\n", err)
+		}
+
+		token3, err := client.CustomToken(ctx, "uid")
+		if err != nil{
+			log.Fatalln("error mintin custom token : %v\n", err)
+		}
+
+		fmt.Printf("Got custom token: %v\n", token)
+	*/
+
+	mySecret := "my-secret"
+	signedToken, err := token2.SignedString([]byte(mySecret))
+
+	fmt.Printf("Other token: %v\n", signedToken)
+	/*fmt.Printf("Other token3: %v\n", token3)*/
+
+	rolPtr := flag.String("Rol", "", "userRole")
+	var userPtr string
+	if strings.ToLower(*rolPtr) =="therapist" || strings.ToLower(*rolPtr) == "centreAdmin" {
+		flag.StringVar(&userPtr, "Name", "", "userName")
+	}
+
+	flag.Parse()
+
+	fmt.Println("Rol: ", *rolPtr)
+	fmt.Println("Name: ", userPtr)
+}
